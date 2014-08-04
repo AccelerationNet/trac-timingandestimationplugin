@@ -111,7 +111,7 @@ fields = billable, totalhours, hours, estimatedhours, internal
 #    disable - removes input in favor of text
 billable.permission = TIME_VIEW:hide, TIME_RECORD:disable
 totalhours.permission = TIME_VIEW:remove, TIME_RECORD:disable
-hours.permission = TIME_RECORD:remove
+hours.permission = TIME_VIEW:remove, TIME_RECORD:disable
 estimatedhours.permission = TIME_RECORD:disable
 internal.permission = TIME_RECORD:hide
 }}}
