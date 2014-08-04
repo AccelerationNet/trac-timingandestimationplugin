@@ -41,11 +41,7 @@ The 'Time Reports' button should be in the main title bar.  Whether or not you s
 
 === Set Bill Date ===
 
-This button will add now as a bill date.  This is mostly to make it
-easier to select the last time you billed.  This would allow you to
-set a ticket as having been billed at a given time while others have
-not, and accurately get the correct billing information for all
-tickets.
+This button will add now as a bill date.  This is mostly to make it easier to select the last time you billed. 
 
 == Reports ==
 === Report Types ===
@@ -115,7 +111,7 @@ fields = billable, totalhours, hours, estimatedhours, internal
 #    disable - removes input in favor of text
 billable.permission = TIME_VIEW:hide, TIME_RECORD:disable
 totalhours.permission = TIME_VIEW:remove, TIME_RECORD:disable
-hours.permission = TIME_RECORD:remove
+hours.permission = TIME_VIEW:remove, TIME_RECORD:disable
 estimatedhours.permission = TIME_RECORD:disable
 internal.permission = TIME_RECORD:hide
 }}}

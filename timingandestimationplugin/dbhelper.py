@@ -1,3 +1,14 @@
+import trac.db.pool
+import trac.db.sqlite_backend
+import trac.db.postgres_backend
+import trac.db.mysql_backend
+
+def is_db_type(db, typeToVerify):
+    cnx = db.cnx
+    t = type(cnx)
+    if t == trac.db.pool.PooledConnection:
+        t = type(cnx.cnx)
+    return typeToVerify == t
 
 def get_all(env, sql, *params):
     """Executes the query and returns the (description, data)"""
@@ -80,16 +91,33 @@ def execute_in_nested_trans(env, name, *args):
             raise e
     return result
 
+def current_schema (env):
+    db = env.get_read_db()
+    if is_db_type(db, trac.db.sqlite_backend.SQLiteConnection):
+        return None
+    elif is_db_type(db, trac.db.mysql_backend.MySQLConnection):
+        return get_scalar(env, 'SELECT schema();')
+    elif is_db_type(db, trac.db.postgres_backend.PostgreSQLConnection):
+        return get_scalar(env, 'SHOW search_path;')
+
+def _prep_schema(s):
+    #remove double quotes, escape single quotes
+    if not s: return "'<NOT VALID>'"
+    return ','.join(("'"+i.replace('"','').replace("'","''")+"'"
+                     for i in s.split(',')))
 
 def db_table_exists(env,  table):
-    has_table = True;
-    try:
-        execute_in_nested_trans(
-            env, "db_table_exists",
-            ("SELECT * FROM %s LIMIT 1" % table,[]))
-    except:
-        has_table = False;
-    return has_table
+    db = env.get_read_db()
+    cnt = None
+    if is_db_type(db, trac.db.sqlite_backend.SQLiteConnection):
+        sql = "select count(*) from sqlite_master where type = 'table' and name = %s"
+        cnt = get_scalar(env, sql, 0, table)
+    else:
+        sql = """SELECT count(*) FROM information_schema.tables 
+                 WHERE table_name = %%s and table_schema in (%s)
+              """ % _prep_schema(current_schema(env))
+        cnt = get_scalar(env, sql, 0, table)
+    return cnt > 0
 
 def get_column_as_list(env, sql, col=0, *params):
     data = get_all(env, sql, *params)[1] or ()
