@@ -10,6 +10,7 @@ import csv
 from trac.mimeview.api import (IContentConverter)
 from trac.resource import Resource
 from trac.web.chrome import (Chrome, web_context)
+from trac.util.translation import _
 import re
 
 
@@ -59,7 +60,7 @@ class TandEFilteredQueryConversions(Component):
     # Internal methods
     def _filtered_columns(self, req, cols):
         # find the columns that should be hidden
-        denied = [field for (field, label) in denied_fields(self, req, cols)]
+        denied = [field for (field, label) in denied_fields(self, req)]
         return [c for c in cols if c not in denied]
 
     def _export_csv(self, req, query, sep=',', mimetype='text/plain'):
